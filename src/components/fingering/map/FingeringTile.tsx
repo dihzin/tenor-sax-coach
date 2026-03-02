@@ -108,13 +108,12 @@ const FingeringTile: React.FC<FingeringTileProps> = memo(({
                 <StaffGlyph staff={pitch.staff} width={92} height={80} palette="technical" />
             </div>
 
-            {/* Diagrama */}
             <div className="fm-tile__diagram">
                 <SaxDiagramMap
                     pressed={variant.diagram.pressed}
                     optional={variant.diagram.optional}
-                    width={65}
-                    height={145}
+                    width={70}
+                    height={157}
                 />
             </div>
 

@@ -360,8 +360,8 @@
     justify-content: center;
     align-items: center;
     padding: 12px 0 8px;
-    min-height: 157px;
-    /* acomoda SaxDiagramMap height=145 + padding */
+    min-height: 168px;
+    /* acomoda SaxDiagramMap height=157 + padding */
 }
 
 /* Variant switcher */

@@ -177,8 +177,8 @@ const CompareCol: React.FC<CompareColProps> = memo(({ entry, variant, slot, diff
                 pressed={variant.diagram.pressed}
                 optional={variant.diagram.optional}
                 diffKeys={diffKeys}
-                width={72}
-                height={152}
+                width={78}
+                height={164}
             />
         </div>
     </div>
