@@ -31,7 +31,7 @@ const FingeringTile: React.FC<FingeringTileProps> = memo(({ entry, showAlternati
 
             {/* ── Pauta SVG ── */}
             <div className="fm-tile__staff">
-                <StaffGlyph staff={pitch.staff} width={82} height={68} palette="technical" />
+                <StaffGlyph staff={pitch.staff} width={92} height={76} palette="technical" />
             </div>
 
             {/* ── Diagrama SVG ─── */}
@@ -39,8 +39,8 @@ const FingeringTile: React.FC<FingeringTileProps> = memo(({ entry, showAlternati
                 <SaxDiagramMap
                     pressed={variant.diagram.pressed}
                     optional={variant.diagram.optional}
-                    width={60}
-                    height={130}
+                    width={65}
+                    height={140}
                 />
             </div>
 

@@ -12,20 +12,17 @@
     --fm-paper: #F8F7F3;
     --fm-surface: #FFFFFF;
     --fm-line: #C8C0B0;
-    /* divisórias internas */
     --fm-line-sec: #8A7E6A;
-    /* bordas de seção */
     --fm-bg-hdr: #EDEAE2;
-    /* fundo cabeçalho seção/tile */
     --fm-text-1: #0E0D0A;
     --fm-text-2: #3E3830;
     --fm-text-3: #8A7E6A;
-    --fm-accent: #0D2640;
-    /* azul naval profundo */
-    --fm-accent-lt: #1A4060;
+    --fm-accent: #08172A;
+    /* sincroniza com pressed do SVG */
+    --fm-accent-lt: #163050;
 
-    /* Tile: largura fixa para grid de 12 sempre consistente */
-    --fm-tile-w: 116px;
+    /* Tile: 120px comporta diagrama +8% (era 116) */
+    --fm-tile-w: 120px;
 
     --fm-font: 'DM Sans', system-ui, sans-serif;
     --fm-mono: 'DM Mono', 'Roboto Mono', monospace;
@@ -344,26 +341,28 @@
     opacity: .65;
 }
 
-/* Pauta */
+/* Pauta — 84px (acomoda StaffGlyph 92x76 + padding 4px) */
 .fm-tile__staff {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-shrink: 0;
-    height: 76px;
+    height: 84px;
     border-bottom: 1px solid var(--fm-line);
     background: var(--fm-surface);
-    padding: 3px 0;
+    padding: 4px 0;
 }
 
-/* Diagrama */
+/* Diagrama — gap óptico +6px via padding-top */
 .fm-tile__diagram {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 6px 0 8px;
-    min-height: 140px;
+    padding: 12px 0 8px;
+    /* 12px topo = +6px óptico */
+    min-height: 152px;
+    /* cobre 140px SVG + pads */
 }
 
 /* Variant switcher */
