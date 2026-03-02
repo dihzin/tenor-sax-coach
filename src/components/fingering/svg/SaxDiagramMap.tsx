@@ -45,35 +45,35 @@ const Y = {
     h6: 124,
 };
 
-// ── style helper com override de sw ──────────────────────────
+// ── style + className helper ─────────────────────────────
 function sty(
     id: FingeringKeyId,
     p: FingeringKeyId[],
     opt: FingeringKeyId[],
     sw?: number,
 ) {
-    if (p.includes(id)) return { fill: C.pressedFill, stroke: C.pressedStroke, sw: sw ?? 1, dash: undefined };
-    if (opt.includes(id)) return { fill: C.optFill, stroke: C.optStroke, sw: sw ?? C.openSW, dash: C.optDash };
-    return { fill: C.openFill, stroke: C.openStroke, sw: sw ?? C.openSW, dash: undefined };
+    if (p.includes(id)) return { fill: C.pressedFill, stroke: C.pressedStroke, sw: sw ?? 1, dash: undefined, cls: 'sax-key sax-key--pressed' };
+    if (opt.includes(id)) return { fill: C.optFill, stroke: C.optStroke, sw: sw ?? C.openSW, dash: C.optDash, cls: 'sax-key sax-key--optional' };
+    return { fill: C.openFill, stroke: C.openStroke, sw: sw ?? C.openSW, dash: undefined, cls: 'sax-key sax-key--open' };
 }
 
 interface BP { id: FingeringKeyId; p: FingeringKeyId[]; opt: FingeringKeyId[] }
 
 const Dot = memo(({ cx, cy, r = R, id, p, opt, sw }: BP & { cx: number; cy: number; r?: number; sw?: number }) => {
     const s = sty(id, p, opt, sw);
-    return <circle cx={cx} cy={cy} r={r} fill={s.fill} stroke={s.stroke} strokeWidth={s.sw} strokeDasharray={s.dash} />;
+    return <circle className={s.cls} cx={cx} cy={cy} r={r} fill={s.fill} stroke={s.stroke} strokeWidth={s.sw} strokeDasharray={s.dash} />;
 });
 Dot.displayName = 'Dot';
 
 const Ov = memo(({ cx, cy, rx, ry, id, p, opt, sw }: BP & { cx: number; cy: number; rx: number; ry: number; sw?: number }) => {
     const s = sty(id, p, opt, sw);
-    return <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={s.fill} stroke={s.stroke} strokeWidth={s.sw} strokeDasharray={s.dash} />;
+    return <ellipse className={s.cls} cx={cx} cy={cy} rx={rx} ry={ry} fill={s.fill} stroke={s.stroke} strokeWidth={s.sw} strokeDasharray={s.dash} />;
 });
 Ov.displayName = 'Ov';
 
 const Bx = memo(({ x, y, w, h, id, p, opt, sw }: BP & { x: number; y: number; w: number; h: number; sw?: number }) => {
     const s = sty(id, p, opt, sw);
-    return <rect x={x - w / 2} y={y - h / 2} width={w} height={h} rx={2} fill={s.fill} stroke={s.stroke} strokeWidth={s.sw} strokeDasharray={s.dash} />;
+    return <rect className={s.cls} x={x - w / 2} y={y - h / 2} width={w} height={h} rx={2} fill={s.fill} stroke={s.stroke} strokeWidth={s.sw} strokeDasharray={s.dash} />;
 });
 Bx.displayName = 'Bx';
 

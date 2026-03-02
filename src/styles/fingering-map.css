@@ -392,10 +392,59 @@
     border-color: var(--fm-accent);
 }
 
+/* ──────────────────────────────────────────────────────────────
+   INTERATIVIDADE TÉCNICA — hover + foco
+   Princípio: invisível do ponto de vista de UI.
+   ──────────────────────────────────────────────────────────── */
+
+/* Hover: keys abertas recuam, pressed dominam */
+.fm-tile .sax-key {
+    transition: opacity 0.12s ease;
+}
+
+.fm-tile:hover .sax-key--open {
+    opacity: 0.22;
+}
+
+.fm-tile:hover .sax-key--optional {
+    opacity: 0.45;
+}
+
+.fm-tile:hover .sax-key--pressed {
+    opacity: 1;
+}
+
+/* Foco: tile em destaque */
+.fm-tile--focused {
+    border-left: 2px solid var(--fm-accent);
+    /* Sem sombra — manter aparência técnica */
+}
+
+.fm-tile--focused .fm-tile__header {
+    background: #E5E2D8;
+    /* levemente mais escuro que bg-hdr */
+}
+
+/* Dimmed: tiles fora do foco */
+.fm-tile--dimmed {
+    opacity: 0.38;
+    transition: opacity 0.18s ease;
+}
+
+/* Hover em dimmed não ativa o hover de chaves */
+.fm-tile--dimmed:hover .sax-key--open {
+    opacity: 1;
+}
+
+.fm-tile--dimmed:hover .sax-key--optional {
+    opacity: 1;
+}
+
 /* ── PDF-only elements hidden on screen ─────────────────────*/
 .pdf-only {
     display: none;
 }
+
 
 /* ─────────────────────────────────────────────────────────────
    PRINT / PDF
@@ -510,6 +559,17 @@
         grid-template-columns: repeat(12, 1fr) !important;
         gap: 0 !important;
         overflow: visible !important;
+    }
+
+    /* Reset interatividade no print — PDF sempre 100% */
+    .fm-tile--dimmed,
+    .fm-tile--focused {
+        opacity: 1 !important;
+        border-left: none !important;
+    }
+
+    .fm-tile--focused .fm-tile__header {
+        background: #EDEAE2 !important;
     }
 
     /* Tile */

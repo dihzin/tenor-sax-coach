@@ -1,5 +1,4 @@
-// src/components/fingering/map/FingeringRegisterSection.tsx — v2
-// Grid cromático FIXO com barra de referência cromática acima
+// src/components/fingering/map/FingeringRegisterSection.tsx — v3 (foco passado ao tile)
 import React, { memo } from 'react';
 import type { FingeringEntry, Register } from '../../../lib/fingering/types';
 import FingeringTile from './FingeringTile';
@@ -11,19 +10,24 @@ const REGISTER_LABEL: Record<Register, string> = {
     altissimo: 'ALTÍSSIMO',
 };
 
-// Ordem cromática fixa (C → B) para o header de referência
 const CHROMATIC_ROW = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
 interface FingeringRegisterSectionProps {
     register: Register;
     entries: FingeringEntry[];
     showAlternatives: boolean;
+    /** ID da nota em foco (global, pode ser de outra seção) */
+    focusedId: string | null;
+    onFocusNote: (id: string) => void;
 }
 
 const FingeringRegisterSection: React.FC<FingeringRegisterSectionProps> = memo(({
-    register, entries, showAlternatives,
+    register, entries, showAlternatives, focusedId, onFocusNote,
 }) => {
     if (entries.length === 0) return null;
+
+    // Há foco ativo nesta seção?
+    const sectionHasFocus = focusedId !== null && entries.some(e => e.id === focusedId);
 
     return (
         <section
@@ -31,7 +35,6 @@ const FingeringRegisterSection: React.FC<FingeringRegisterSectionProps> = memo((
             aria-labelledby={`section-${register}`}
             data-register={register}
         >
-            {/* Header técnico da seção */}
             <header className="fm-section__header">
                 <h2 id={`section-${register}`} className="fm-section__title">
                     {REGISTER_LABEL[register]}
@@ -39,12 +42,11 @@ const FingeringRegisterSection: React.FC<FingeringRegisterSectionProps> = memo((
                 <span className="fm-section__count">{entries.length} notas</span>
             </header>
 
-            {/* Barra de referência cromática */}
+            {/* Barra cromática */}
             <div className="fm-chromatic-bar" aria-hidden="true">
                 {CHROMATIC_ROW.map(note => {
                     const isPresent = entries.some(e =>
-                        e.pitch.enName.replace(/[0-9]/g, '') === note ||
-                        e.pitch.enName === note
+                        e.pitch.enName.replace(/[0-9]/g, '') === note
                     );
                     return (
                         <span
@@ -63,11 +65,22 @@ const FingeringRegisterSection: React.FC<FingeringRegisterSectionProps> = memo((
                 role="list"
                 aria-label={`Notas do registro ${REGISTER_LABEL[register]}`}
             >
-                {entries.map(entry => (
-                    <div key={entry.id} role="listitem">
-                        <FingeringTile entry={entry} showAlternatives={showAlternatives} />
-                    </div>
-                ))}
+                {entries.map(entry => {
+                    const isFocused = entry.id === focusedId;
+                    // Dimmed só se houver foco nesta seção E não for a nota focada
+                    const isDimmed = sectionHasFocus && !isFocused;
+                    return (
+                        <div key={entry.id} role="listitem">
+                            <FingeringTile
+                                entry={entry}
+                                showAlternatives={showAlternatives}
+                                isFocused={isFocused}
+                                isDimmed={isDimmed}
+                                onFocusNote={onFocusNote}
+                            />
+                        </div>
+                    );
+                })}
             </div>
         </section>
     );
