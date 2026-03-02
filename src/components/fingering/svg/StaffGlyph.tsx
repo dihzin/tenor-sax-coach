@@ -101,50 +101,37 @@ const StaffGlyph: React.FC<StaffGlyphProps> = memo(({
     const nX = width / 2 + (hasAcc ? 8 : 1);
 
     // ── Ledger lines ─────────────────────────────────────────
-    // Posicionamento baseado em ledgerCount (dataset) + distância ao staff
-    // A posição das linhas suplementares é calculada geometricamente:
-    //   - 1 espaço do staff = GAP (7.5px) em y
-    //   - Ó 5ª linha do staff: LINE_Y[0] = TOP = 19
-    //     (staff lines vão de y=19 a y=49, mais alto na tela = menor y)
-    //   - Ledger acima: cada ledger está a GAP px acima da anterior,
-    //     começando 1 espaço (GAP) acima da 5ª linha
-    //   - Ledger abaixo: cada ledger a GAP abaixo, começando 1 espaço
-    //     abaixo da 1ª linha (LINE_Y[4] = 49)
+    // Ledger lines renderizadas a GAP*2 por slot (linha + espaço)
+    // Coordenadas no espaço do grupo (rawNoteYc = posição natural da nota).
+    //
+    // Estratégia: "snapping geométrico"
+    //   As linhas do staff ficam em y = TOP + k*GAP (k=0..4)
+    //   As ledger acima ficam em y = TOP - GAP - (i-1)*GAP*2  (i=1,2,...)
+    //   As ledger abaixo ficam em y = TOP + 4*GAP + GAP + (i-1)*GAP*2
+    //   Mas a NOTA pode estar no espaço (meio de ledger) ou na ledger.
+    //   Usamos o fatto que stepToY já mapeia cada step para a posição correta,
+    //   e geramos ledgers snappando para os múltiplos de GAP próximos ao staff.
     const ledgerYs: number[] = [];
-
-    const STAFF_TOP = TOP;              // y da 5ª linha (topo visual)
-    const STAFF_BOTTOM = TOP + 4 * GAP;   // y da 1ª linha (fundo visual) = 49
-
-    // Nota em coordenadas naturais (antes do clamp, para calcular distância)
     const rawNoteYc = TOP - staff.diatonicStep * GAP + OPT_Y;
+    const STAFF_TOP = LINE_Y[0];               // y = TOP = 19
+    const STAFF_BOTTOM = LINE_Y[LINE_Y.length - 1]; // y = TOP + 4*GAP = 49
 
-    if (staff.ledgerAbove && staff.ledgerCount > 0) {
-        // Ledgers são desenhadas de 2 em 2 GAP (linha, espaço, linha...)
-        // Começa 1 espaço acima da nota mais próxima à 5ª linha
-        // Para simplificar: posiciona ledgers de GAP*2 em GAP*2 acima do staff top,
-        // começando em (STAFF_TOP - GAP*2) para a 1ª linha suplementar
-        for (let i = 1; i <= staff.ledgerCount; i++) {
-            ledgerYs.push(STAFF_TOP - GAP * 2 * i);
-        }
-        // Se a nota está no espaço entre a última ledger e a penúltima, adicionar ledger da nota
-        // (nota em espaço acima da última ledger não precisa de linha extra)
-        // A nota em si fica em rawNoteYc - se está em posic de LINHA, já está incluída
-        // Adicionar ledger NA posição da nota se ela está em linha (não espaço)
-        const lastLedgerY = STAFF_TOP - GAP * 2 * staff.ledgerCount;
-        // Se nota está dentro de 1 GAP acima da última ledger = está no espaço = sem ledger na nota
-        // Se nota está acima de 1 GAP da última = está na linha = adicionar ledger na nota
-        if (rawNoteYc < lastLedgerY - GAP) {
-            ledgerYs.push(rawNoteYc);
+    if (staff.ledgerAbove) {
+        // Ledger acima: começa em STAFF_TOP - GAP*2 (1ª linha suplementar)
+        // e continua até alcançar/ultrapassar a nota
+        let ledgerY = STAFF_TOP - GAP * 2;
+        while (ledgerY >= rawNoteYc - GAP * 0.5) {
+            ledgerYs.push(ledgerY);
+            ledgerY -= GAP * 2;
         }
     }
 
-    if (staff.ledgerBelow && staff.ledgerCount > 0) {
-        for (let i = 1; i <= staff.ledgerCount; i++) {
-            ledgerYs.push(STAFF_BOTTOM + GAP * 2 * i);
-        }
-        const lastLedgerY = STAFF_BOTTOM + GAP * 2 * staff.ledgerCount;
-        if (rawNoteYc > lastLedgerY + GAP) {
-            ledgerYs.push(rawNoteYc);
+    if (staff.ledgerBelow) {
+        // Ledger abaixo: começa em STAFF_BOTTOM + GAP*2 (1ª linha suplementar baixo)
+        let ledgerY = STAFF_BOTTOM + GAP * 2;
+        while (ledgerY <= rawNoteYc + GAP * 0.5) {
+            ledgerYs.push(ledgerY);
+            ledgerY += GAP * 2;
         }
     }
 
