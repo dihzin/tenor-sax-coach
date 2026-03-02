@@ -1,0 +1,88 @@
+Crie um projeto React completo chamado "Tenor Sax Coach" usando Vite + TypeScript.
+
+## Stack
+- React 18 + Vite
+- TypeScript
+- Tailwind CSS (para estilos utilitários complementares)
+- Tone.js (para áudio: metrônomo e playback de notas)
+- React Router v6 (navegação entre páginas)
+
+## Estrutura de páginas
+1. /dashboard — visão geral com stats, streak de dias, módulos em progresso
+2. /digitacoes — tabela de digitações interativa (componente já desenvolvido, ver abaixo)
+3. /musicas — repertório com playalongs (lista de músicas por nível)
+4. /teoria — módulos de teoria musical
+5. /pratica — metrônomo + exercícios guiados
+
+## Componente de Digitações (já desenvolvido)
+O arquivo saxapp.jsx em anexo contém o componente completo da página de digitações,
+incluindo:
+- SVG do saxofone tenor visto de frente com todas as chaves mapeadas
+- 33 notas nos registros Grave, Médio e Agudo
+- Diagrama interativo (chaves acendem ao clicar na nota)
+- Legenda expansível de todas as chaves
+- Barra de progresso por registro
+
+Integre esse componente em src/pages/Digitacoes.tsx mantendo toda a lógica e estilos.
+Converta os inline styles e a string de CSS para Tailwind + CSS Modules onde possível,
+mas preserve a aparência visual (tema escuro dourado, fontes Playfair Display + DM Mono + DM Sans).
+
+## Design system
+- Tema: escuro com acentos dourados
+- Cores principais: --gold:#D4891A, --dark:#0D0B07, --dark2:#171309, --cream:#F0E8D0
+- Fontes: Playfair Display (títulos), DM Mono (labels/códigos), DM Sans (corpo)
+- Importar via Google Fonts no index.html
+
+## Funcionalidades a implementar
+1. Metrônomo (página /pratica):
+   - BPM ajustável (40–220)
+   - Compasso 2/4, 3/4, 4/4
+   - Som de clique usando Tone.js (MembraneSynth ou arquivo de áudio)
+   - Botão start/stop com animação de pulso visual
+
+2. Player de notas (página /digitacoes):
+   - Ao clicar em uma nota, tocar o som correspondente via Tone.js (Synth simples)
+   - Frequências do Sax Tenor em Bb (instrumento transpositor: C escrito = Bb concert)
+
+3. Sistema de progresso (localStorage):
+   - Marcar notas como "praticadas"
+   - Contar streak de dias consecutivos
+   - Percentual de cobertura por registro (Grave/Médio/Agudo)
+
+4. Repertório (/musicas):
+   - Lista de músicas com título, estilo, nível (iniciante/intermediário/avançado)
+   - Filtro por nível
+   - Cards com BPM sugerido e link para partitura (campo de URL)
+
+## Arquitetura de arquivos sugerida
+src/
+  components/
+    Sidebar.tsx
+    SaxDiagram.tsx      ← SVG extraído do saxapp.jsx
+    NoteButton.tsx
+    Metronome.tsx
+    SongCard.tsx
+  pages/
+    Dashboard.tsx
+    Digitacoes.tsx
+    Musicas.tsx
+    Teoria.tsx
+    Pratica.tsx
+  hooks/
+    useMetronome.ts     ← lógica Tone.js isolada
+    useProgress.ts      ← localStorage progress tracking
+  data/
+    notes.ts            ← array NOTES extraído do saxapp.jsx
+    songs.ts            ← lista de músicas
+    theory.ts           ← módulos de teoria
+  styles/
+    globals.css         ← variáveis CSS + fontes
+  App.tsx
+  main.tsx
+
+## Instruções adicionais
+- Sidebar fixa com navegação entre as 5 rotas
+- Layout responsivo (sidebar colapsa em mobile com hamburguer)
+- Animações suaves com CSS transitions (sem bibliotecas externas de animação)
+- Código comentado em português
+- README.md com instruções de instalação e scripts disponíveis
