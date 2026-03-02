@@ -99,7 +99,6 @@ const StaffGlyph: React.FC<StaffGlyphProps> = memo(({
 
     const hasAcc = !!staff.accidental;
     const nX = width / 2 + (hasAcc ? 8 : 1);
-    const nY = stepToY(staff.diatonicStep);
 
     // Ledger lines
     const ledgerYs: number[] = [];
@@ -116,54 +115,71 @@ const StaffGlyph: React.FC<StaffGlyphProps> = memo(({
         if (staff.diatonicStep === 5.5) addLedger(stepToY(5));
     }
 
+    // ── Clamp dinâmico: nota sempre dentro do viewBox ─────────
+    // rawNoteY pode ser negativo em registros altos (MÉDIO, AGUDO, ALTÍSSIMO)
+    // → transladamos todo o grupo SVG para baixo, mantendo proporções relativas
+    const rawNoteY = stepToY(staff.diatonicStep);
+    const NOTE_MIN = NRY + 5;                      // topo mínimo
+    const NOTE_MAX = height - NRY - 8;             // fundo máximo
+    const clampedY = Math.max(NOTE_MIN, Math.min(NOTE_MAX, rawNoteY));
+    const dy = clampedY - rawNoteY;          // delta de translação
+
+    // nY interno ao grupo: posição ANTES do translate
+    const nYrel = rawNoteY;
+
     // Haste — ponto de saída corrigido para elipse girada
     const stemUp = staff.diatonicStep < 2.5;
     const edgeX = NRX * COS15;
     const stemX = stemUp ? nX + edgeX - 0.5 : nX - edgeX + 0.5;
-    const stemY1 = stemUp ? nY - NRY * 0.42 : nY + NRY * 0.42;
-    const stemY2 = stemUp ? nY - STEM_L : nY + STEM_L;
+    const stemY1 = stemUp ? nYrel - NRY * 0.42 : nYrel + NRY * 0.42;
+    const stemY2 = stemUp ? nYrel - STEM_L : nYrel + STEM_L;
 
-    const accX = nX - NRX - 9.5;  // respiro ligeiramente maior
+    const accX = nX - NRX - 9.5;
 
     return (
         <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} aria-hidden="true">
 
-            {/* Staff lines — base neutra com contraste aumentado */}
-            {LINE_Y.map((y, i) => (
-                <line key={i}
-                    x1={4} y1={y} x2={width - 4} y2={y}
-                    stroke={staffInk} strokeWidth={1.45}
+            {/* Grupo transladado: staff + nota seguem juntos.
+                viewBox das linhas do staff que saem pelos extremos é clipado automaticamente. */}
+            <g transform={`translate(0, ${dy})`}>
+
+                {/* Staff lines */}
+                {LINE_Y.map((y, i) => (
+                    <line key={i}
+                        x1={4} y1={y} x2={width - 4} y2={y}
+                        stroke={staffInk} strokeWidth={1.45}
+                    />
+                ))}
+
+                {/* Ledger lines */}
+                {ledgerYs.map((y, i) => (
+                    <line key={'l' + i}
+                        x1={nX - NRX - 3.5} y1={y}
+                        x2={nX + NRX + 3.5} y2={y}
+                        stroke={staffInk} strokeWidth={1.35}
+                    />
+                ))}
+
+                {/* Acidentais */}
+                {staff.accidental === 'sharp' && <SharpSign x={accX} y={nYrel} ink={noteInk} />}
+                {staff.accidental === 'flat' && <FlatSign x={accX} y={nYrel} ink={noteInk} />}
+                {staff.accidental === 'natural' && <NaturalSign x={accX} y={nYrel} ink={noteInk} />}
+
+                {/* Haste */}
+                <line
+                    x1={stemX} y1={stemY1}
+                    x2={stemX} y2={stemY2}
+                    stroke={noteInk} strokeWidth={1.00} strokeLinecap="butt"
                 />
-            ))}
 
-            {/* Ledger lines */}
-            {ledgerYs.map((y, i) => (
-                <line key={'l' + i}
-                    x1={nX - NRX - 3.5} y1={y}
-                    x2={nX + NRX + 3.5} y2={y}
-                    stroke={staffInk} strokeWidth={1.35}
+                {/* Notehead — oval editorial */}
+                <ellipse
+                    cx={nX} cy={nYrel}
+                    rx={NRX} ry={NRY}
+                    fill={noteInk}
+                    transform={`rotate(${ROT}, ${nX}, ${nYrel})`}
                 />
-            ))}
-
-            {/* Acidentais */}
-            {staff.accidental === 'sharp' && <SharpSign x={accX} y={nY} ink={noteInk} />}
-            {staff.accidental === 'flat' && <FlatSign x={accX} y={nY} ink={noteInk} />}
-            {staff.accidental === 'natural' && <NaturalSign x={accX} y={nY} ink={noteInk} />}
-
-            {/* Haste — ligeiramente mais espessa (+5%) */}
-            <line
-                x1={stemX} y1={stemY1}
-                x2={stemX} y2={stemY2}
-                stroke={noteInk} strokeWidth={1.00} strokeLinecap="butt"
-            />
-
-            {/* Notehead — massa dominante, oval inclinado editorial */}
-            <ellipse
-                cx={nX} cy={nY}
-                rx={NRX} ry={NRY}
-                fill={noteInk}
-                transform={`rotate(${ROT}, ${nX}, ${nY})`}
-            />
+            </g>
         </svg>
     );
 });
