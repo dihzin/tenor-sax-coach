@@ -50,7 +50,7 @@ const FingeringTile: React.FC<FingeringTileProps> = memo(({
 
             {/* Pauta SVG */}
             <div className="fm-tile__staff">
-                <StaffGlyph staff={pitch.staff} width={92} height={76} palette="technical" />
+                <StaffGlyph staff={pitch.staff} width={92} height={80} palette="technical" />
             </div>
 
             {/* Diagrama SVG — hover CSS atua em .sax-key--open/.sax-key--pressed */}

@@ -341,13 +341,13 @@
     opacity: .65;
 }
 
-/* Pauta — 84px (acomoda StaffGlyph 92x76 + padding 4px) */
+/* Pauta — 90px (acomoda StaffGlyph 92x80 + padding) */
 .fm-tile__staff {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-shrink: 0;
-    height: 84px;
+    height: 90px;
     border-bottom: 1px solid var(--fm-line);
     background: var(--fm-surface);
     padding: 4px 0;
