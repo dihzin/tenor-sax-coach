@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
 import Digitacoes from './pages/Digitacoes';
+import MapaGlobal from './pages/MapaGlobal';
 import Musicas from './pages/Musicas';
 import Teoria from './pages/Teoria';
 import Pratica from './pages/Pratica';
@@ -43,6 +44,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/digitacoes" element={<Digitacoes />} />
+            <Route path="/digitacoes/mapa" element={<MapaGlobal />} />
             <Route path="/musicas" element={<Musicas />} />
             <Route path="/teoria" element={<Teoria />} />
             <Route path="/pratica" element={<Pratica />} />

@@ -3,6 +3,7 @@
 // Integra o SaxDiagram SVG com player de notas via Tone.js
 // ─────────────────────────────────────────────────────────────
 import React, { useState, useCallback, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import * as Tone from 'tone';
 import SaxDiagram from '../components/SaxDiagram';
 import { NOTES, REGION_COLOR, REGION_LABEL, KEY_SHORT_LABEL, KEY_LEGEND } from '../data/notes';
@@ -59,6 +60,30 @@ const Digitacoes: React.FC = () => {
         <div>
             <h1 className="pg-title">Tabela de <em>Digitações</em></h1>
             <p className="pg-sub">Clique em uma nota para ver exatamente onde posicionar os dedos — e ouvi-la</p>
+
+            {/* Link para o Mapa Global */}
+            <Link
+                to="/digitacoes/mapa"
+                id="mapa-global-link"
+                style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    marginBottom: 12,
+                    padding: '5px 12px',
+                    fontFamily: "'DM Mono', monospace",
+                    fontSize: 11,
+                    letterSpacing: 0.5,
+                    color: 'var(--gold)',
+                    border: '1px solid rgba(200,130,14,.3)',
+                    borderRadius: 5,
+                    textDecoration: 'none',
+                    background: 'rgba(200,130,14,.06)',
+                    transition: 'background 0.15s',
+                }}
+            >
+                ⊞ Mapa Global de Digitações
+            </Link>
 
             {/* Toggle da legenda de chaves */}
             <button
