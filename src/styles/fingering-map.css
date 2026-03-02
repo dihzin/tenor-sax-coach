@@ -511,16 +511,69 @@
 }
 
 .fm-compare__notes {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     font-size: 13px;
     font-weight: 700;
     color: var(--fm-text-1);
 }
 
-.fm-compare__delta {
+.fm-compare__note-a {
+    color: #2A7A3A;
+}
+
+.fm-compare__note-b {
+    color: #1A4A8A;
+}
+
+.fm-compare__arrow {
+    color: var(--fm-text-3);
+    font-weight: 400;
+    font-size: 11px;
+}
+
+/* Badge de dificuldade */
+.fm-compare__badge {
     font-family: var(--fm-mono);
     font-size: 9px;
-    color: var(--fm-text-3);
+    font-weight: 600;
+    padding: 2px 7px;
     margin-left: auto;
+    letter-spacing: .4px;
+}
+
+.fm-compare__badge--identica {
+    color: var(--fm-text-3);
+    border: 1px solid var(--fm-line);
+}
+
+.fm-compare__badge--facil {
+    color: #1A6028;
+    background: #EAF5EC;
+    border: 1px solid #A8D8B0;
+}
+
+.fm-compare__badge--media {
+    color: #6B4A00;
+    background: #FBF3E2;
+    border: 1px solid #D4B870;
+}
+
+.fm-compare__badge--dificil {
+    color: #7A1800;
+    background: #FBECEC;
+    border: 1px solid #D4A0A0;
+}
+
+/* Estado de espera */
+.fm-compare__waiting {
+    font-family: var(--fm-mono);
+    font-size: 9px;
+    color: var(--fm-accent);
+    margin-left: auto;
+    letter-spacing: .3px;
+    opacity: .8;
 }
 
 .fm-compare__close {
@@ -648,6 +701,19 @@
     background: #1A4A8A;
 }
 
+.fm-compare__diff-dot--release {
+    background: #8A1A00;
+}
+
+.fm-compare__diff-dot--press {
+    background: #1A4A8A;
+}
+
+.fm-compare__diff-dot--keep {
+    background: var(--fm-line);
+    border: 1px solid var(--fm-text-3);
+}
+
 .fm-compare__diff-key {
     color: var(--fm-text-1);
     font-weight: 600;
@@ -655,6 +721,56 @@
 
 .fm-compare__diff-dir {
     color: var(--fm-text-3);
+}
+
+.fm-compare__diff-title--keep {
+    color: var(--fm-line-sec);
+    margin-top: 8px;
+}
+
+.fm-compare__diff-item--keep {
+    opacity: .5;
+}
+
+.fm-compare__diff-item--release .fm-compare__diff-dir {
+    color: #8A1A00;
+}
+
+.fm-compare__diff-item--press .fm-compare__diff-dir {
+    color: #1A4A8A;
+}
+
+/* Slot badge nos diagramas de comparação */
+.fm-compare__slot-badge {
+    font-family: var(--fm-mono);
+    font-size: 8px;
+    font-weight: 700;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 2px;
+    flex-shrink: 0;
+}
+
+.fm-compare__slot-badge--a {
+    background: #2A7A3A;
+    color: #FFF;
+}
+
+.fm-compare__slot-badge--b {
+    background: #1A4A8A;
+    color: #FFF;
+}
+
+/* Borda lateral nos col A/B */
+.fm-compare__col--a {
+    border-left: 2px solid #2A7A3A;
+}
+
+.fm-compare__col--b {
+    border-right: 2px solid #1A4A8A;
 }
 
 /* ComparePanel no print: ocultar */

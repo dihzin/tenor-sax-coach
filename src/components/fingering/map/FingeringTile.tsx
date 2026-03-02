@@ -14,8 +14,8 @@ function calcTransition(a: FingeringEntry, b: FingeringEntry) {
     for (const k of pB) if (!pA.has(k)) delta++;
     const difficulty =
         delta === 0 ? null :
-            delta <= 1 ? 'fácil' :
-                delta <= 3 ? 'média' :
+            delta <= 2 ? 'fácil' :
+                delta <= 4 ? 'média' :
                     'difícil';
     return { delta, difficulty };
 }

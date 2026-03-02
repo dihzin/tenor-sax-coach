@@ -43,13 +43,15 @@ const MapaGlobal: React.FC = () => {
         [notesByRegister]
     );
 
-    // Par para comparação (quando 2 selecionados)
-    const comparePair = useMemo((): [FingeringEntry, FingeringEntry] | null => {
-        if (compareIds.length < 2) return null;
-        const a = allEntries.find(e => e.id === compareIds[0]);
-        const b = allEntries.find(e => e.id === compareIds[1]);
-        return a && b ? [a, b] : null;
-    }, [compareIds, allEntries]);
+    // Par para comparação — painel aparece desde a 1ª seleção
+    const compareEntryA = useMemo(() =>
+        compareIds.length >= 1 ? allEntries.find(e => e.id === compareIds[0]) ?? null : null,
+        [compareIds, allEntries]
+    );
+    const compareEntryB = useMemo(() =>
+        compareIds.length >= 2 ? allEntries.find(e => e.id === compareIds[1]) ?? null : null,
+        [compareIds, allEntries]
+    );
 
     const handleCompareSelect = useCallback((entry: FingeringEntry) => {
         setCompareIds(prev => {
@@ -122,11 +124,11 @@ const MapaGlobal: React.FC = () => {
                 onExportPDF={handleExportPDF}
             />
 
-            {/* Compare Panel — aparece quando 2 notas selecionadas */}
-            {comparePair && (
+            {/* Compare Panel — aparece desde a 1ª seleção (espera 2ª nota) */}
+            {compareEntryA && (
                 <ComparePanel
-                    entryA={comparePair[0]}
-                    entryB={comparePair[1]}
+                    entryA={compareEntryA}
+                    entryB={compareEntryB}
                     onClose={() => { setCompareIds([]); setCompareMode(false); }}
                 />
             )}
