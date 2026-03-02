@@ -1,4 +1,4 @@
-// src/components/fingering/map/FingeringRegisterSection.tsx — v3 (foco passado ao tile)
+// src/components/fingering/map/FingeringRegisterSection.tsx — v4
 import React, { memo } from 'react';
 import type { FingeringEntry, Register } from '../../../lib/fingering/types';
 import FingeringTile from './FingeringTile';
@@ -16,18 +16,22 @@ interface FingeringRegisterSectionProps {
     register: Register;
     entries: FingeringEntry[];
     showAlternatives: boolean;
-    /** ID da nota em foco (global, pode ser de outra seção) */
     focusedId: string | null;
     onFocusNote: (id: string) => void;
+    compareMode: boolean;
+    compareIds: string[];
+    onCompareSelect: (entry: FingeringEntry) => void;
 }
 
 const FingeringRegisterSection: React.FC<FingeringRegisterSectionProps> = memo(({
-    register, entries, showAlternatives, focusedId, onFocusNote,
+    register, entries, showAlternatives,
+    focusedId, onFocusNote,
+    compareMode, compareIds, onCompareSelect,
 }) => {
     if (entries.length === 0) return null;
 
-    // Há foco ativo nesta seção?
-    const sectionHasFocus = focusedId !== null && entries.some(e => e.id === focusedId);
+    const sectionHasFocus = !compareMode && focusedId !== null &&
+        entries.some(e => e.id === focusedId);
 
     return (
         <section
@@ -40,6 +44,11 @@ const FingeringRegisterSection: React.FC<FingeringRegisterSectionProps> = memo((
                     {REGISTER_LABEL[register]}
                 </h2>
                 <span className="fm-section__count">{entries.length} notas</span>
+                {compareMode && (
+                    <span className="fm-section__cmp-hint">
+                        Clique em 2 notas para comparar
+                    </span>
+                )}
             </header>
 
             {/* Barra cromática */}
@@ -60,15 +69,16 @@ const FingeringRegisterSection: React.FC<FingeringRegisterSectionProps> = memo((
             </div>
 
             {/* Grid cromático */}
-            <div
-                className="fm-grid"
-                role="list"
-                aria-label={`Notas do registro ${REGISTER_LABEL[register]}`}
-            >
-                {entries.map(entry => {
-                    const isFocused = entry.id === focusedId;
-                    // Dimmed só se houver foco nesta seção E não for a nota focada
+            <div className="fm-grid" role="list">
+                {entries.map((entry, idx) => {
+                    const isFocused = !compareMode && entry.id === focusedId;
                     const isDimmed = sectionHasFocus && !isFocused;
+                    // Compare slots
+                    const cmpIdxA = compareIds.indexOf(entry.id);
+                    const compareSlot: 'A' | 'B' | undefined =
+                        cmpIdxA === 0 ? 'A' : cmpIdxA === 1 ? 'B' : undefined;
+                    const prevEntry = idx > 0 ? entries[idx - 1] : null;
+
                     return (
                         <div key={entry.id} role="listitem">
                             <FingeringTile
@@ -77,6 +87,10 @@ const FingeringRegisterSection: React.FC<FingeringRegisterSectionProps> = memo((
                                 isFocused={isFocused}
                                 isDimmed={isDimmed}
                                 onFocusNote={onFocusNote}
+                                prevEntry={prevEntry}
+                                compareMode={compareMode}
+                                compareSlot={compareSlot}
+                                onCompareSelect={onCompareSelect}
                             />
                         </div>
                     );

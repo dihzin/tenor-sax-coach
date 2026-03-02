@@ -1,11 +1,11 @@
-// src/pages/MapaGlobal.tsx
-// Rota: /digitacoes/mapa — paralela, não interfere com /digitacoes
+// src/pages/MapaGlobal.tsx — v3 (compare + transition)
 import React, { useState, useMemo, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import type { Instrument, Register } from '../lib/fingering/types';
+import type { Instrument, Register, FingeringEntry } from '../lib/fingering/types';
 import { TENOR_DATASET, selectByRegister } from '../lib/fingering/dataset.tenor';
 import FingeringMapToolbar from '../components/fingering/map/FingeringMapToolbar';
 import FingeringRegisterSection from '../components/fingering/map/FingeringRegisterSection';
+import ComparePanel from '../components/fingering/map/ComparePanel';
 import '../styles/fingering-map.css';
 
 const REGISTERS: Register[] = ['grave', 'medio', 'agudo'];
@@ -17,19 +17,19 @@ const MapaGlobal: React.FC = () => {
     const [showAltissimo, setShowAltissimo] = useState(false);
     const [showAlternatives, setShowAlternatives] = useState(false);
     const [isPrintMode, setIsPrintMode] = useState(false);
-
-    // Lê ?nota= via lazy init — sem re-render ao montar
     const [focusedId, setFocusedId] = useState<string | null>(
         () => new URLSearchParams(window.location.search).get('nota')
     );
 
-    const dataset = instrument === 'tenor' ? TENOR_DATASET : TENOR_DATASET;
+    // ── Compare state ───────────────────────────────────────────
+    const [compareMode, setCompareMode] = useState(false);
+    const [compareIds, setCompareIds] = useState<string[]>([]);
 
+    const dataset = instrument === 'tenor' ? TENOR_DATASET : TENOR_DATASET;
     const activeRegisters = useMemo<Register[]>(() =>
         showAltissimo ? [...REGISTERS, 'altissimo'] : REGISTERS,
         [showAltissimo]
     );
-
     const notesByRegister = useMemo(() =>
         Object.fromEntries(
             activeRegisters.map(reg => [reg, selectByRegister(dataset, reg)])
@@ -37,7 +37,34 @@ const MapaGlobal: React.FC = () => {
         [dataset, activeRegisters]
     );
 
-    // Toggle foco + sync URL
+    // Lookup plano de entries por id
+    const allEntries = useMemo(() =>
+        Object.values(notesByRegister).flat(),
+        [notesByRegister]
+    );
+
+    // Par para comparação (quando 2 selecionados)
+    const comparePair = useMemo((): [FingeringEntry, FingeringEntry] | null => {
+        if (compareIds.length < 2) return null;
+        const a = allEntries.find(e => e.id === compareIds[0]);
+        const b = allEntries.find(e => e.id === compareIds[1]);
+        return a && b ? [a, b] : null;
+    }, [compareIds, allEntries]);
+
+    const handleCompareSelect = useCallback((entry: FingeringEntry) => {
+        setCompareIds(prev => {
+            if (prev.includes(entry.id)) return prev.filter(id => id !== entry.id);
+            if (prev.length >= 2) return [prev[1], entry.id];
+            return [...prev, entry.id];
+        });
+    }, []);
+
+    const handleCompareMode = useCallback((v: boolean) => {
+        setCompareMode(v);
+        if (!v) setCompareIds([]);
+    }, []);
+
+    // ── Focus state ─────────────────────────────────────────────
     const handleFocusNote = useCallback((id: string) => {
         setFocusedId(prev => {
             const next = prev === id ? null : id;
@@ -74,7 +101,7 @@ const MapaGlobal: React.FC = () => {
                 <Link to="/digitacoes" className="fm-back-link">← Estudo Individual</Link>
             </div>
 
-            {/* Header PDF (só no print) */}
+            {/* Header PDF */}
             <div className="fm-pdf-header pdf-only">
                 <span className="fm-pdf-title">
                     Saxophone Fingering Chart — {instrument === 'tenor' ? 'Tenor' : 'Alto'}
@@ -87,11 +114,22 @@ const MapaGlobal: React.FC = () => {
                 instrument={instrument}
                 showAltissimo={showAltissimo}
                 showAlternatives={showAlternatives}
+                compareMode={compareMode}
                 onInstrument={setInstrument}
                 onAltissimo={setShowAltissimo}
                 onAlternatives={setShowAlternatives}
+                onCompareMode={handleCompareMode}
                 onExportPDF={handleExportPDF}
             />
+
+            {/* Compare Panel — aparece quando 2 notas selecionadas */}
+            {comparePair && (
+                <ComparePanel
+                    entryA={comparePair[0]}
+                    entryB={comparePair[1]}
+                    onClose={() => { setCompareIds([]); setCompareMode(false); }}
+                />
+            )}
 
             {/* Legenda */}
             <div className="fm-legend no-print">
@@ -104,6 +142,11 @@ const MapaGlobal: React.FC = () => {
                 <span className="fm-legend-item">
                     <span className="fm-legend-dot fm-legend-dot--optional" />Opcional
                 </span>
+                {compareMode && (
+                    <span className="fm-legend-item fm-legend-item--cmp">
+                        <span className="fm-legend-dot fm-legend-dot--diff" />Tecla muda
+                    </span>
+                )}
             </div>
 
             {/* Seções */}
@@ -116,11 +159,14 @@ const MapaGlobal: React.FC = () => {
                         showAlternatives={showAlternatives}
                         focusedId={focusedId}
                         onFocusNote={handleFocusNote}
+                        compareMode={compareMode}
+                        compareIds={compareIds}
+                        onCompareSelect={handleCompareSelect}
                     />
                 ))}
             </div>
 
-            {/* Legenda PDF (última página) */}
+            {/* Legenda PDF */}
             <div className="fm-pdf-legend pdf-only">
                 <div className="fm-pdf-legend-title">Legenda das Chaves</div>
                 <div className="fm-pdf-legend-grid">
