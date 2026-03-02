@@ -100,19 +100,38 @@ const StaffGlyph: React.FC<StaffGlyphProps> = memo(({
     const hasAcc = !!staff.accidental;
     const nX = width / 2 + (hasAcc ? 8 : 1);
 
-    // Ledger lines
+    // ── Ledger lines ─────────────────────────────────────────
+    // Sistema de steps do dataset:
+    //   step  0  = F5 = 1ª linha do topo do staff (LINE_Y[0])
+    //   step -4  = E4 = 5ª linha do fundo do staff (LINE_Y[4])
+    //   step > 0 = acima do staff → linhas suplementares superiores
+    //   step < -4 = abaixo do staff → linhas suplementares inferiores
+    // Linhas suplementares são desenhadas SOMENTE em posições inteiras
+    // (o .5 indica espaços entre linhas, não linhas em si)
     const ledgerYs: number[] = [];
     const addLedger = (y: number) => { if (!ledgerYs.includes(y)) ledgerYs.push(y); };
 
-    if (staff.ledgerBelow) {
-        const bot = Math.floor(staff.diatonicStep);
-        for (let s = -1; s >= bot; s--) addLedger(stepToY(s));
-        if (staff.diatonicStep === -0.5) addLedger(stepToY(-1));
+    const step = staff.diatonicStep;
+
+    // Linhas suplementares SUPERIORES (step > 0)
+    // Linha da nota mais próxima ao staff = floor do step se par (ou ceil se .5)
+    if (step > 0) {
+        // Traçar ledger em cada posição de linha acima do staff
+        // step 0 = 1ª linha topo → ledgers em 1, 2, 3... (posições inteiras)
+        const topStep = Math.floor(step);   // linha mais alta necessária
+        for (let s = 1; s <= topStep; s++) {
+            addLedger(stepToY(s));
+        }
+        // Se a nota está numa posição de linha (inteiro), já está incluída
+        // Se está no espaço (.5), a linha abaixo já foi adicionada
     }
-    if (staff.ledgerAbove) {
-        const top = Math.ceil(staff.diatonicStep);
-        for (let s = 5; s <= top; s++) addLedger(stepToY(s));
-        if (staff.diatonicStep === 5.5) addLedger(stepToY(5));
+
+    // Linhas suplementares INFERIORES (step < -4)
+    if (step < -4) {
+        const botStep = Math.ceil(step);    // linha mais baixa necessária
+        for (let s = -5; s >= botStep; s--) {
+            addLedger(stepToY(s));
+        }
     }
 
     // ── Clamp dinâmico: nota sempre dentro do viewBox ─────────
